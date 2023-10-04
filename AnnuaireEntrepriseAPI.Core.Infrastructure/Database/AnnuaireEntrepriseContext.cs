@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using AnnuaireEntrepriseAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AnnuaireEntrepriseAPI.Models;
+namespace AnnuaireEntrepriseAPI.Database;
 
 public partial class AnnuaireEntrepriseContext : DbContext
 {
