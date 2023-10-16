@@ -3,6 +3,7 @@ using AnnuaireEntrepriseAPI.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnnuaireEntrepriseAPI.Migrations
 {
     [DbContext(typeof(AnnuaireEntrepriseContext))]
-    partial class AnnuaireEntrepriseContextModelSnapshot : ModelSnapshot
+    [Migration("20231016070132_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,13 +104,13 @@ namespace AnnuaireEntrepriseAPI.Migrations
             modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.User", b =>
                 {
                     b.HasOne("AnnuaireEntrepriseAPI.Models.Service", "Service")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AnnuaireEntrepriseAPI.Models.Site", "Site")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("SiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -115,16 +118,6 @@ namespace AnnuaireEntrepriseAPI.Migrations
                     b.Navigation("Service");
 
                     b.Navigation("Site");
-                });
-
-            modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Service", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Site", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

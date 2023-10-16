@@ -1,4 +1,5 @@
 ﻿using AnnuaireEntrepriseAPI.Database;
+using AnnuaireEntrepriseAPI.DTOs;
 using AnnuaireEntrepriseAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,15 +29,33 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<User>> GetAll()
+        public ActionResult<IEnumerable<UserDTO>> GetAll()
         {
             if (!_context.Users.Any())
             {
                 return NoContent();
-
             }
 
-            return _context.Users.ToArray();
+            var usersAllBDD = _context.Users.Include(item => item.Site).Include(item => item.Service).ToList();
+
+            var usersAll = new List<UserDTO>();
+
+            foreach (var user in usersAllBDD)
+            {
+                usersAll.Add(new UserDTO 
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Surname = user.Surname,
+                    Email = user.Email,
+                    MobilePhone = user.MobilePhone,
+                    PhoneNumber = user.PhoneNumber,
+                    ServiceId = user.Service.Id,
+                    SiteId = user.Site.Id
+                });
+            }
+
+            return usersAll;
         }
 
         [HttpGet("[action]/{id}", Name = "GetUserById")]
@@ -48,7 +67,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserById(int id)
+        public async Task<ActionResult<UserDTO>> GetUserById(int id)
         {
             if (!_context.Users.Any())
             {
@@ -63,7 +82,18 @@ namespace AnnuaireEntrepriseAPI.Controllers
             //    return NotFound();
             //}
 
-            var userResult = _context.Users.Where(item => item.Id == id).Single();
+            var userResultBDD = _context.Users.Where(item => item.Id == id).Include(item => item.Service).Include(item => item.Site).Single();
+
+            var userResult = new UserDTO();
+
+            userResult.Id = userResultBDD.Id;
+            userResult.Name = userResultBDD.Name;
+            userResult.Surname = userResultBDD.Surname;
+            userResult.Email = userResultBDD.Email;
+            userResult.PhoneNumber = userResultBDD.PhoneNumber;
+            userResult.MobilePhone = userResultBDD.MobilePhone;
+            userResult.ServiceId = userResultBDD.Service.Id;
+            userResult.SiteId = userResultBDD.Site.Id;
 
             //if (siteResult == null) { return NotFound(); }
 
@@ -82,7 +112,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddUser(User user)
+        public async Task<IActionResult> AddUser(UserDTO user)
         {
             if (!ModelState.IsValid)
             {
@@ -90,15 +120,20 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
             }
 
+            //vérif doublon
+            if (_context.Users.Where(item => item.Name == user.Name && item.Surname == user.Surname && item.Email == user.Email && item.MobilePhone == user.MobilePhone && item.PhoneNumber == user.PhoneNumber).Count() > 0)
+            {
+                return Conflict(); //Manque phrase pour dire que déja existant
+            }
+
+            var test = _context.Sites.Where(item => item.Id == user.SiteId).Any();
             //Verif si le site et le service existe bien
-            Site verifSite = _context.Sites.Where(item => item.Town == user.SiteNavigation.Town).Single();
-            if (verifSite == null)
+            if (_context.Sites.Where(item => item.Id == user.SiteId).Any() == false)
             {
                 return BadRequest();
             }
 
-            Service verifService = _context.Services.Where(item => item.Name == user.ServiceNavigation.Name).Single();
-            if(verifService == null)
+            if(_context.Services.Where(item => item.Id == user.ServiceId).Any() == false)
             {
                 return BadRequest();
             }
@@ -110,17 +145,17 @@ namespace AnnuaireEntrepriseAPI.Controllers
             finalUser.Email = user.Email;
             finalUser.PhoneNumber = user.PhoneNumber;
             finalUser.MobilePhone = user.MobilePhone;
-            finalUser.Service = user.ServiceNavigation.Name;
-            finalUser.Site = user.SiteNavigation.Town;
-
+            finalUser.Service = _context.Services.Where(item => item.Id == user.ServiceId).Single();
+            finalUser.Site = _context.Sites.Where(item => item.Id == user.SiteId).Single();
 
             _context.Users.AddAsync(finalUser);
             _context.SaveChanges();
-            var result = _context.Users.Where(item => item.Id == user.Id).ToArray();
+            var result = _context.Users.Where(item => item.Name == finalUser.Name && item.Surname == finalUser.Surname && item.Email == finalUser.Email).Single();
             if (result is not null)
-                return CreatedAtRoute("GetUserById", new { name = finalUser.Id }, finalUser);
+                return CreatedAtRoute("GetUserById", new { name = result.Id }, result);
             else
                 return Ok(Enumerable.Empty<Site>());
+
 
         }
 
@@ -164,14 +199,14 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateSite(int id, User user)
+        public async Task<ActionResult<UserDTO>> UpdateUser(int id, UserDTO user)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            User userBdd = _context.Users.Where(item => item.Id == id).FirstOrDefault();
+            User userBdd = _context.Users.Where(item => item.Id == id).Include(item => item.Service).Include(item => item.Site).FirstOrDefault();
 
             if (userBdd == null)
             {
@@ -179,12 +214,12 @@ namespace AnnuaireEntrepriseAPI.Controllers
             }
 
             //Verif si le site et le service existe bien
-            if (_context.Sites.Where(item => item.Town == user.SiteNavigation.Town).Any())
+            if (_context.Sites.Where(item => item.Id == user.SiteId).Any() == false)
             {
                 return BadRequest();
             }
 
-            if (_context.Services.Where(item => item.Name == user.ServiceNavigation.Name).Any())
+            if (_context.Services.Where(item => item.Id == user.ServiceId).Any() == false)
             {
                 return BadRequest();
             }
@@ -194,8 +229,8 @@ namespace AnnuaireEntrepriseAPI.Controllers
             userBdd.Email = user.Email;
             userBdd.PhoneNumber = user.PhoneNumber;
             userBdd.MobilePhone = user.MobilePhone;
-            userBdd.Service = user.Service;
-            userBdd.Site = user.Site;
+            userBdd.Service = _context.Services.Where(item => item.Id == user.ServiceId).Single();
+            userBdd.Site = _context.Sites.Where(item => item.Id == user.SiteId).Single();
 
             _context.Entry(userBdd).State = EntityState.Modified;
             _context.SaveChangesAsync();

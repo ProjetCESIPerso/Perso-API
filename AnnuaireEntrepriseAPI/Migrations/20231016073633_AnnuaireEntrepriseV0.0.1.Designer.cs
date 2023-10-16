@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnnuaireEntrepriseAPI.Migrations
 {
     [DbContext(typeof(AnnuaireEntrepriseContext))]
-    [Migration("20231004131800_Snapshot041023-2")]
-    partial class Snapshot0410232
+    [Migration("20231016073633_AnnuaireEntrepriseV0.0.1")]
+    partial class AnnuaireEntrepriseV001
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,13 +34,11 @@ namespace AnnuaireEntrepriseAPI.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(70)
-                        .HasColumnType("nvarchar(70)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("PK__Service__737584F71EBE5F88");
+                    b.HasKey("Id");
 
-                    b.ToTable("Service", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Site", b =>
@@ -53,13 +51,11 @@ namespace AnnuaireEntrepriseAPI.Migrations
 
                     b.Property<string>("Town")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("PK__Site__FF37FFF7D8B84281");
+                    b.HasKey("Id");
 
-                    b.ToTable("Site", (string)null);
+                    b.ToTable("Sites");
                 });
 
             modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.User", b =>
@@ -72,72 +68,66 @@ namespace AnnuaireEntrepriseAPI.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MobilePhone")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Service")
-                        .IsRequired()
-                        .HasMaxLength(70)
-                        .HasColumnType("nvarchar(70)");
-
-                    b.Property<int>("ServiceNavigationId")
+                    b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Site")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("SiteNavigationId")
+                    b.Property<int>("SiteId")
                         .HasColumnType("int");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("PK__Users__3214EC07918F8F15");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ServiceNavigationId");
+                    b.HasIndex("ServiceId");
 
-                    b.HasIndex("SiteNavigationId");
+                    b.HasIndex("SiteId");
 
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.User", b =>
                 {
-                    b.HasOne("AnnuaireEntrepriseAPI.Models.Service", "ServiceNavigation")
-                        .WithMany()
-                        .HasForeignKey("ServiceNavigationId")
+                    b.HasOne("AnnuaireEntrepriseAPI.Models.Service", "Service")
+                        .WithMany("Users")
+                        .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AnnuaireEntrepriseAPI.Models.Site", "SiteNavigation")
-                        .WithMany()
-                        .HasForeignKey("SiteNavigationId")
+                    b.HasOne("AnnuaireEntrepriseAPI.Models.Site", "Site")
+                        .WithMany("Users")
+                        .HasForeignKey("SiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ServiceNavigation");
+                    b.Navigation("Service");
 
-                    b.Navigation("SiteNavigation");
+                    b.Navigation("Site");
+                });
+
+            modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Service", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Site", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

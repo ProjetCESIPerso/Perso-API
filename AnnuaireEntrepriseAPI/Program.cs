@@ -1,4 +1,7 @@
 using AnnuaireEntrepriseAPI.Database;
+using AnnuaireEntrepriseAPI.DTOs;
+using AnnuaireEntrepriseAPI.Models;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
