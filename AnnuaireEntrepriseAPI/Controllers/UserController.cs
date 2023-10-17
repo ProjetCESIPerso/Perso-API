@@ -155,8 +155,6 @@ namespace AnnuaireEntrepriseAPI.Controllers
                 return CreatedAtRoute("GetUserById", new { id = user.Id }, user);
             else
                 return Ok(Enumerable.Empty<Site>());
-
-
         }
 
         [HttpPost("[action]/{id}")]

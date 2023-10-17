@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using NSwag.Annotations;
+using AnnuaireEntrepriseAPI.DTOs;
 
 namespace AnnuaireEntrepriseAPI.Controllers
 {
@@ -26,7 +27,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<Site>> GetAll()
+        public ActionResult<IEnumerable<SiteDTO>> GetAll()
         {
             if (!_context.Sites.Any())
             {
@@ -34,10 +35,23 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
             }
 
-            return _context.Sites.ToArray();
+            var siteAllBDD = _context.Sites.ToList();
+
+            var siteAll = new List<SiteDTO>();
+
+            foreach (var site in siteAllBDD)
+            {
+                siteAll.Add(new SiteDTO
+                {
+                    Id = site.Id,
+                    Town = site.Town,
+                });
+            }
+
+            return siteAll;
         }
 
-        [HttpGet("[action]/{name}", Name = "GetSiteById")]
+        [HttpGet("[action]/{id}", Name = "GetSiteById")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Site), Description = "La récupération du site a été un succès")]
         [SwaggerResponse(HttpStatusCode.NoContent, typeof(EmptyResult), Description = "La table site est vide")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID du site renseigné n'est pas connu de la base de données")]
@@ -46,7 +60,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetSiteById(string name)
+        public async Task<ActionResult<SiteDTO>> GetSiteById(int id)
         {
             if (!_context.Sites.Any())
             {
@@ -61,7 +75,12 @@ namespace AnnuaireEntrepriseAPI.Controllers
             //    return NotFound();
             //}
 
-            var siteResult = _context.Sites.Where(item => item.Town == name).Single();
+            var siteResultBDD = _context.Sites.Where(item => item.Id == id).Single();
+
+            var siteResult = new SiteDTO();
+
+            siteResult.Id = siteResultBDD.Id;
+            siteResult.Town = siteResultBDD.Town;
 
             //if (siteResult == null) { return NotFound(); }
 
@@ -88,6 +107,12 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
             }
 
+            //vérif doublon
+            if (_context.Sites.Where(item => item.Town.ToUpper() == site.ToUpper()).Count() > 0)
+            {
+                return Conflict(); //Manque phrase pour dire que déja existant
+            }
+
             Site siteBdd = new Site();
             siteBdd.Town = site;
 
@@ -95,7 +120,13 @@ namespace AnnuaireEntrepriseAPI.Controllers
             _context.SaveChanges();
             var result = _context.Sites.Where(item => item.Town == site).ToArray();
             if (result is not null)
-                return CreatedAtRoute("GetSiteById", new { name = siteBdd.Town }, siteBdd);
+            {
+                var siteToSiteDTO = new SiteDTO();
+                siteToSiteDTO.Id = siteBdd.Id;
+                siteToSiteDTO.Town = siteBdd.Town;
+
+                return CreatedAtRoute("GetSiteById", new { id = siteToSiteDTO.Town }, siteToSiteDTO);
+            }
             else
                 return Ok(Enumerable.Empty<Site>());
 
