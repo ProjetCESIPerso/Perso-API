@@ -152,7 +152,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
             _context.SaveChanges();
             var result = _context.Users.Where(item => item.Name == finalUser.Name && item.Surname == finalUser.Surname && item.Email == finalUser.Email).Single();
             if (result is not null)
-                return CreatedAtRoute("GetUserById", new { name = result.Id }, result);
+                return CreatedAtRoute("GetUserById", new { id = user.Id }, user);
             else
                 return Ok(Enumerable.Empty<Site>());
 

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using NSwag.Annotations;
+using AnnuaireEntrepriseAPI.DTOs;
+using System.Linq;
 
 namespace AnnuaireEntrepriseAPI.Controllers
 {
@@ -26,7 +28,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<Service>> GetAll()
+        public ActionResult<IEnumerable<ServiceDTO>> GetAll()
         {
             if (!_context.Services.Any())
             {
@@ -34,10 +36,23 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
             }
 
-            return _context.Services.ToArray();
+            var serviceAllBDD = _context.Services.ToList();
+
+            var serviceAll = new List<ServiceDTO>();
+
+            foreach (var service in serviceAllBDD)
+            {
+                serviceAll.Add(new ServiceDTO
+                {
+                    Id = service.Id,
+                    Name = service.Name,
+                });
+            }
+
+            return serviceAll;
         }
 
-        [HttpGet("[action]/{name}", Name = "GetServiceById")]
+        [HttpGet("[action]/{id}", Name = "GetServiceById")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Service), Description = "La récupération du service a été un succès")]
         [SwaggerResponse(HttpStatusCode.NoContent, typeof(EmptyResult), Description = "La table service est vide")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID du service renseigné n'est pas connu de la base de données")]
@@ -46,7 +61,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetServiceById(string name)
+        public async Task<ActionResult<ServiceDTO>> GetServiceById(int id)
         {
             if (!_context.Services.Any())
             {
@@ -61,7 +76,12 @@ namespace AnnuaireEntrepriseAPI.Controllers
             //    return NotFound();
             //}
 
-            var serviceResult = _context.Services.Where(item => item.Name == name).Single();
+            var serviceResultBDD = _context.Services.Where(item => item.Id == id).Single();
+
+            var serviceResult = new ServiceDTO();
+
+            serviceResult.Id = serviceResultBDD.Id;
+            serviceResult.Name = serviceResultBDD.Name;
 
             //if (serviceResult == null) { return NotFound(); }
 
@@ -88,6 +108,12 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
             }
 
+            //vérif doublon
+            if (_context.Services.Where(item => item.Name.ToUpper() == name.ToUpper()).Count() > 0)
+            {
+                return Conflict(); //Manque phrase pour dire que déja existant
+            }
+
             Service serviceBdd = new Service();
             serviceBdd.Name = name;
 
@@ -95,7 +121,13 @@ namespace AnnuaireEntrepriseAPI.Controllers
             _context.SaveChanges();
             var result = _context.Services.Where(item => item.Name == name).ToArray();
             if (result is not null)
-                return CreatedAtRoute("GetServiceById", new { name = serviceBdd.Name }, serviceBdd);
+            {
+                var serviceToServiceDTO = new ServiceDTO();
+                serviceToServiceDTO.Id = serviceBdd.Id;
+                serviceToServiceDTO.Name = serviceBdd.Name;
+                
+                return CreatedAtRoute("GetServiceById", new { id = serviceToServiceDTO.Id }, serviceToServiceDTO);
+            }
             else
                 return Ok(Enumerable.Empty<Service>());
 
@@ -141,7 +173,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateService(string name, Service service)
+        public async Task<IActionResult> UpdateService(string name, ServiceDTO service)
         {      
             if (!ModelState.IsValid)
             {
