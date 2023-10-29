@@ -1,5 +1,6 @@
 ﻿using AnnuaireEntrepriseAPI.Database;
 using AnnuaireEntrepriseAPI.DTOs;
+using AnnuaireEntrepriseAPI.Interfaces;
 using AnnuaireEntrepriseAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : ControllerBase, IUserController
     {
 
         private readonly AnnuaireEntrepriseContext _context;
@@ -98,6 +99,68 @@ namespace AnnuaireEntrepriseAPI.Controllers
             //if (siteResult == null) { return NotFound(); }
 
             return Ok(userResult);
+        }
+
+        [HttpGet("[action]/{id}", Name = "GetNbOfAttributionToService")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(int), Description = "La récupération du nombre d'attribution a été un succès")]
+        [SwaggerResponse(HttpStatusCode.NoContent, typeof(EmptyResult), Description = "La table user est vide")]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID renseigné n'est pas connu de la base de données")]
+        [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(EmptyResult), Description = "Erreur serveur interne")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<int>> GetNbOfAttributionToService(int id)
+        {
+            if (!_context.Users.Any())
+            {
+                return NoContent();
+
+            }
+
+            //Vérification si le produit avec l'id renseigné existe
+            //var siteToFind = _context.Sites.Find(name); //Plante car name doit être un int
+            //if (siteToFind == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var userResultBDD = _context.Users.Where(item => item.Service.Id == id).Include(item => item.Service).Include(item => item.Site).Count();
+
+            //if (siteResult == null) { return NotFound(); }
+
+            return Ok(userResultBDD);
+        }
+
+        [HttpGet("[action]/{id}", Name = "GetNbOfAttributionToSite")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(int), Description = "La récupération du nombre d'attribution a été un succès")]
+        [SwaggerResponse(HttpStatusCode.NoContent, typeof(EmptyResult), Description = "La table user est vide")]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID renseigné n'est pas connu de la base de données")]
+        [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(EmptyResult), Description = "Erreur serveur interne")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<int>> GetNbOfAttributionToSite(int id)
+        {
+            if (!_context.Users.Any())
+            {
+                return NoContent();
+
+            }
+
+            //Vérification si le produit avec l'id renseigné existe
+            //var siteToFind = _context.Sites.Find(name); //Plante car name doit être un int
+            //if (siteToFind == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var userResultBDD = _context.Users.Where(item => item.Site.Id == id).Include(item => item.Service).Include(item => item.Site).Count();
+
+            //if (siteResult == null) { return NotFound(); }
+
+            return Ok(userResultBDD);
         }
         #endregion
 

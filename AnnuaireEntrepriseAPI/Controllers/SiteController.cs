@@ -5,12 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Net;
 using NSwag.Annotations;
 using AnnuaireEntrepriseAPI.DTOs;
+using AnnuaireEntrepriseAPI.Interfaces;
 
 namespace AnnuaireEntrepriseAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SiteController : ControllerBase
+    public class SiteController : ControllerBase, ISiteController
     {
         private readonly AnnuaireEntrepriseContext _context;
         public SiteController(AnnuaireEntrepriseContext context) 
@@ -76,6 +77,42 @@ namespace AnnuaireEntrepriseAPI.Controllers
             //}
 
             var siteResultBDD = _context.Sites.Where(item => item.Id == id).Single();
+
+            var siteResult = new SiteDTO();
+
+            siteResult.Id = siteResultBDD.Id;
+            siteResult.Town = siteResultBDD.Town;
+
+            //if (siteResult == null) { return NotFound(); }
+
+            return Ok(siteResult);
+        }
+
+        [HttpGet("[action]/{name}", Name = "GetSiteByName")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Site), Description = "La récupération du site a été un succès")]
+        [SwaggerResponse(HttpStatusCode.NoContent, typeof(EmptyResult), Description = "La table site est vide")]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "Le nom du site renseigné n'est pas connu de la base de données")]
+        [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(EmptyResult), Description = "Erreur serveur interne")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<SiteDTO>> GetSiteByName(string name)
+        {
+            if (!_context.Sites.Any())
+            {
+                return NoContent();
+
+            }
+
+            //Vérification si le produit avec l'id renseigné existe
+            //var siteToFind = _context.Sites.Find(name); //Plante car name doit être un int
+            //if (siteToFind == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var siteResultBDD = _context.Sites.Where(item => item.Town == name).Single();
 
             var siteResult = new SiteDTO();
 
@@ -172,7 +209,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateSite(string town, Site site)
+        public async Task<IActionResult> UpdateSite(string town, SiteDTO site)
         {      
             if (!ModelState.IsValid)
             {
