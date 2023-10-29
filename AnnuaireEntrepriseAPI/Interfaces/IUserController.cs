@@ -39,5 +39,19 @@ namespace AnnuaireEntrepriseAPI.Interfaces
         /// <param name="site">Données à modifier</param>
         /// <returns></returns>
         Task<ActionResult<UserDTO>> UpdateUser(int id, UserDTO site);
+
+        /// <summary>
+        /// Récupère le nombre d'utilisateur lié à un site
+        /// </summary>
+        /// <param name="id">id du site</param>
+        /// <returns>le nombre d'attribution</returns>
+        Task<ActionResult<int>> GetNbOfAttributionToSite(int id);
+
+        /// <summary>
+        /// Récupère le nombre d'utilisateur lié à un service
+        /// </summary>
+        /// <param name="id">id du service</param>
+        /// <returns>le nombre d'attribution</returns>
+        Task<ActionResult<int>> GetNbOfAttributionToService(int id);
     }
 }
