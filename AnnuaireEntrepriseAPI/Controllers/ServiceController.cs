@@ -71,11 +71,11 @@ namespace AnnuaireEntrepriseAPI.Controllers
             }
 
             //Vérification si le produit avec l'id renseigné existe
-            //var serviceToFind = _context.Services.Find(name); //Plante car name doit être un int
-            //if (serviceToFind == null)
-            //{
-            //    return NotFound();
-            //}
+            var siteToFind = _context.Services.Where(item => item.Id == id).Count();
+            if (siteToFind == null || siteToFind == 0)
+            {
+                return NotFound();
+            }
 
             var serviceResultBDD = _context.Services.Where(item => item.Id == id).Single();
 
@@ -106,13 +106,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
             }
 
-            //Vérification si le produit avec l'id renseigné existe
-            //var serviceToFind = _context.Services.Find(name); //Plante car name doit être un int
-            //if (serviceToFind == null)
-            //{
-            //    return NotFound();
-            //}
-            if (!_context.Services.Where(item => item.Name == name).Any()) return NoContent();
+            if (!_context.Services.Where(item => item.Name.ToLower() == name.ToLower()).Any()) return NoContent();
 
             var serviceResultBDD = _context.Services.Where(item => item.Name == name).Single();
 

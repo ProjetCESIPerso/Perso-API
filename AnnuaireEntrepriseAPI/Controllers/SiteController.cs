@@ -70,11 +70,11 @@ namespace AnnuaireEntrepriseAPI.Controllers
             }
 
             //Vérification si le produit avec l'id renseigné existe
-            //var siteToFind = _context.Sites.Find(name); //Plante car name doit être un int
-            //if (siteToFind == null)
-            //{
-            //    return NotFound();
-            //}
+            var siteToFind = _context.Sites.Where(item => item.Id == id).Count(); //Plante car name doit être un int
+            if (siteToFind == null || siteToFind == 0)
+            {
+                return NotFound();
+            }
 
             var siteResultBDD = _context.Sites.Where(item => item.Id == id).Single();
 
@@ -106,11 +106,11 @@ namespace AnnuaireEntrepriseAPI.Controllers
             }
 
             //Vérification si le produit avec l'id renseigné existe
-            //var siteToFind = _context.Sites.Find(name); //Plante car name doit être un int
-            //if (siteToFind == null)
-            //{
-            //    return NotFound();
-            //}
+            var siteToFind = _context.Sites.Where(item => item.Town.ToLower() == name.ToLower()).Count(); //Plante car name doit être un int
+            if (siteToFind == null || siteToFind == 0)
+            {
+                return NotFound();
+            }
 
             var siteResultBDD = _context.Sites.Where(item => item.Town == name).Single();
 
