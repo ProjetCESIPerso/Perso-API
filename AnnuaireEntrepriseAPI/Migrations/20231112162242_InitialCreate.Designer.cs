@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnnuaireEntrepriseAPI.Migrations
 {
     [DbContext(typeof(AnnuaireEntrepriseContext))]
-    [Migration("20231016073633_AnnuaireEntrepriseV0.0.1")]
-    partial class AnnuaireEntrepriseV001
+    [Migration("20231112162242_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,7 +110,7 @@ namespace AnnuaireEntrepriseAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("AnnuaireEntrepriseAPI.Models.Site", "Site")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("SiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -121,11 +121,6 @@ namespace AnnuaireEntrepriseAPI.Migrations
                 });
 
             modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Service", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Site", b =>
                 {
                     b.Navigation("Users");
                 });

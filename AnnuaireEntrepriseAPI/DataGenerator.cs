@@ -65,17 +65,87 @@ namespace AnnuaireEntrepriseAPI
 
         private Service GetRandomService(Random random)
         {
-            List<Service> services = _context.Services.ToList();
+            List<Service> listServiceAdd = _context.Services.ToList();
+
+            if (listServiceAdd.Count == 0)
+            {
+                listServiceAdd = new List<Service>();
+
+                listServiceAdd.Add(new Service()
+                {
+                    Id = 0,
+                    Name = "Accueil"
+                });
+
+                listServiceAdd.Add(new Service()
+                {
+                    Id = 1,
+                    Name = "Informatique"
+                });
+
+                listServiceAdd.Add(new Service()
+                {
+                    Id = 2,
+                    Name = "Logistique"
+                });
+
+                listServiceAdd.Add(new Service()
+                {
+                    Id = 3,
+                    Name = "Comptabilité"
+                });
+
+                listServiceAdd.Add(new Service()
+                {
+                    Id = 4,
+                    Name = "Administration"
+                });
+            }
 
 
-            return services[random.Next(services.Count)];
+            return listServiceAdd[random.Next(listServiceAdd.Count)];
         }
 
         private Site GetRandomSite(Random random)
         {
-            List<Site> sites = _context.Sites.ToList();
+            List<Site> listSiteAdd = _context.Sites.ToList();
 
-            return sites[random.Next(sites.Count)];
+            if (listSiteAdd.Count == 0)
+            {
+                listSiteAdd = new List<Site>();
+
+                listSiteAdd.Add(new Site()
+                {
+                    Id = 0,
+                    Town = "Accueil"
+                });
+
+                listSiteAdd.Add(new Site()
+                {
+                    Id = 1,
+                    Town = "Informatique"
+                });
+
+                listSiteAdd.Add(new Site()
+                {
+                    Id = 2,
+                    Town = "Logistique"
+                });
+
+                listSiteAdd.Add(new Site()
+                {
+                    Id = 3,
+                    Town = "Comptabilité"
+                });
+
+                listSiteAdd.Add(new Site()
+                {
+                    Id = 4,
+                    Town = "Administration"
+                });
+            }
+
+            return listSiteAdd[random.Next(listSiteAdd.Count)];
         }
     }
 }

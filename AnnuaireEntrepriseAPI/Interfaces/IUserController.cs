@@ -1,4 +1,5 @@
 ﻿using AnnuaireEntrepriseAPI.DTOs;
+using AnnuaireEntrepriseAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AnnuaireEntrepriseAPI.Interfaces

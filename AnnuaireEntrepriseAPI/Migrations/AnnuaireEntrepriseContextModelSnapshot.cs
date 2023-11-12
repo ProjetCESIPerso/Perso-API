@@ -107,7 +107,7 @@ namespace AnnuaireEntrepriseAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("AnnuaireEntrepriseAPI.Models.Site", "Site")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("SiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -118,11 +118,6 @@ namespace AnnuaireEntrepriseAPI.Migrations
                 });
 
             modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Service", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("AnnuaireEntrepriseAPI.Models.Site", b =>
                 {
                     b.Navigation("Users");
                 });

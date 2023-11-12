@@ -52,7 +52,9 @@ namespace AnnuaireEntrepriseAPI.Controllers
                     MobilePhone = user.MobilePhone,
                     PhoneNumber = user.PhoneNumber,
                     ServiceId = user.Service.Id,
-                    SiteId = user.Site.Id
+                    Service = user.Service,
+                    SiteId = user.Site.Id,
+                    Site = user.Site
                 });
             }
 
@@ -284,7 +286,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
             {
                 return BadRequest();
             }
-
+            
             userBdd.Name = user.Name;
             userBdd.Surname = user.Surname;
             userBdd.Email = user.Email;

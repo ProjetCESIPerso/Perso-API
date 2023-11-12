@@ -18,5 +18,9 @@ namespace AnnuaireEntrepriseAPI.DTOs
         public int ServiceId { get; set; }
 
         public int SiteId { get; set; }
+
+        public Service Service { get; set; }
+
+        public Site Site { get; set; }
     }
 }
