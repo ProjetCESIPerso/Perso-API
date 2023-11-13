@@ -210,8 +210,8 @@ namespace AnnuaireEntrepriseAPI.Controllers
             finalUser.Email = user.Email;
             finalUser.PhoneNumber = user.PhoneNumber;
             finalUser.MobilePhone = user.MobilePhone;
-            finalUser.Service = _context.Services.Where(item => item.Id == user.ServiceId).Single();
-            finalUser.Site = _context.Sites.Where(item => item.Id == user.SiteId).Single();
+            finalUser.Service = user.Service;
+            finalUser.Site = user.Site;
 
             _context.Users.AddAsync(finalUser);
             _context.SaveChanges();
@@ -292,8 +292,8 @@ namespace AnnuaireEntrepriseAPI.Controllers
             userBdd.Email = user.Email;
             userBdd.PhoneNumber = user.PhoneNumber;
             userBdd.MobilePhone = user.MobilePhone;
-            userBdd.Service = _context.Services.Where(item => item.Id == user.ServiceId).Single();
-            userBdd.Site = _context.Sites.Where(item => item.Id == user.SiteId).Single();
+            userBdd.Service = user.Service;
+            userBdd.Site = user.Site;
 
             _context.Entry(userBdd).State = EntityState.Modified;
             _context.SaveChangesAsync();
