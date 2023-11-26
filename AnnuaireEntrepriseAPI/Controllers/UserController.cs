@@ -222,7 +222,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
                 return Ok(Enumerable.Empty<Site>());
         }
 
-        [HttpPost("[action]/{id}")]
+        [HttpDelete("[action]/{id}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(EmptyResult), Description = "La suppression de l'utilisateur a été effectué avec succès")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID de l'utilisateur est inconnu de la base de données")]
         [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(EmptyResult), Description = "Erreur serveur interne")]

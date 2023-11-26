@@ -169,7 +169,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
         }
 
-        [HttpPost("[action]/{site}")]
+        [HttpDelete("[action]/{site}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(EmptyResult), Description = "La suppression du site a été effectué avec succès")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID du site est inconnu de la base de données")]
         [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(EmptyResult), Description = "Erreur serveur interne")]

@@ -165,7 +165,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
 
         }
 
-        [HttpPost("[action]/{name}")]
+        [HttpDelete("[action]/{name}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(EmptyResult), Description = "La suppression du service a été effectué avec succès")]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(EmptyResult), Description = "L'ID du service est inconnu de la base de données")]
         [SwaggerResponse(HttpStatusCode.InternalServerError, typeof(EmptyResult), Description = "Erreur serveur interne")]
