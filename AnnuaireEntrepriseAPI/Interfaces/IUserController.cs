@@ -39,7 +39,7 @@ namespace AnnuaireEntrepriseAPI.Interfaces
         /// <param name="id">ID de l'utilisateur à modifier</param>
         /// <param name="site">Données à modifier</param>
         /// <returns></returns>
-        Task<ActionResult<UserDTO>> UpdateUser(int id, UserDTO site);
+        Task<ActionResult<UserUpdateDTO>> UpdateUser(int id, UserUpdateDTO site);
 
         /// <summary>
         /// Récupère le nombre d'utilisateur lié à un site

@@ -262,7 +262,7 @@ namespace AnnuaireEntrepriseAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserDTO>> UpdateUser(int id, UserDTO user)
+        public async Task<ActionResult<UserUpdateDTO>> UpdateUser(int id, UserUpdateDTO user)
         {
             if (!ModelState.IsValid)
             {
@@ -292,8 +292,8 @@ namespace AnnuaireEntrepriseAPI.Controllers
             userBdd.Email = user.Email;
             userBdd.PhoneNumber = user.PhoneNumber;
             userBdd.MobilePhone = user.MobilePhone;
-            userBdd.Service = user.Service;
-            userBdd.Site = user.Site;
+            userBdd.Service = _context.Services.Where(item => item.Id == user.ServiceId).Single();
+            userBdd.Site = _context.Sites.Where(item => item.Id == user.SiteId).Single();
 
             _context.Entry(userBdd).State = EntityState.Modified;
             _context.SaveChangesAsync();
