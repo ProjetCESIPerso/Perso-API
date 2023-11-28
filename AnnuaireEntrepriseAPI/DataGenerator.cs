@@ -27,16 +27,19 @@ namespace AnnuaireEntrepriseAPI
 
             for (int i = 0; i < 1000; i++)
             {
-                var mobilePhone = Convert.ToInt32(GenerateRandomPhoneNumber(random));
-                var phoneNumber = Convert.ToInt32(GenerateRandomPhoneNumber(random));
+                var mobilePhone = GenerateRandomPhoneNumber(random);
+                var phoneNumber = GenerateRandomPhoneNumber(random);
+
+                var randomName = faker.Name.FirstName();
+                var randomSurname = faker.Name.LastName();
 
                 var employee = new User
                 {
-                    Name = faker.Name.LastName(),
-                    Surname = faker.Name.FirstName(),
+                    Name = randomName,
+                    Surname = randomSurname,
                     MobilePhone = mobilePhone.ToString(),
                     PhoneNumber = phoneNumber.ToString(),
-                    Email = faker.Internet.Email(),
+                    Email = faker.Internet.Email(randomName, randomSurname),
                     Service = GetRandomService(random),
                     Site = GetRandomSite(random)
 
@@ -57,7 +60,7 @@ namespace AnnuaireEntrepriseAPI
 
             for (int i = 0; i < 9; i++)
             {
-                phoneNumber += random.Next(0, 10);
+                phoneNumber = phoneNumber + random.Next(0, 10);
             }
 
             return phoneNumber;
@@ -69,7 +72,7 @@ namespace AnnuaireEntrepriseAPI
 
             if (listServiceAdd.Count == 0)
             {
-                listServiceAdd = new List<Service>();
+                //listServiceAdd = new List<Service>();
 
                 listServiceAdd.Add(new Service()
                 {
@@ -100,6 +103,11 @@ namespace AnnuaireEntrepriseAPI
                     Id = 4,
                     Name = "Administration"
                 });
+
+                _context.Services.AddRange(listServiceAdd);
+                _context.SaveChanges();
+
+                Console.WriteLine("Service ajoutés !");
             }
 
 
@@ -112,37 +120,43 @@ namespace AnnuaireEntrepriseAPI
 
             if (listSiteAdd.Count == 0)
             {
-                listSiteAdd = new List<Site>();
+                //listSiteAdd = new List<Site>();
 
                 listSiteAdd.Add(new Site()
                 {
                     Id = 0,
-                    Town = "Accueil"
+                    Town = "Paris"
                 });
 
                 listSiteAdd.Add(new Site()
                 {
                     Id = 1,
-                    Town = "Informatique"
+                    Town = "Nantes"
                 });
 
                 listSiteAdd.Add(new Site()
                 {
                     Id = 2,
-                    Town = "Logistique"
+                    Town = "Toulouse"
                 });
 
                 listSiteAdd.Add(new Site()
                 {
                     Id = 3,
-                    Town = "Comptabilité"
+                    Town = "Nice"
                 });
 
                 listSiteAdd.Add(new Site()
                 {
                     Id = 4,
-                    Town = "Administration"
+                    Town = "Lille"
                 });
+
+
+                _context.Sites.AddRange(listSiteAdd);
+                _context.SaveChanges();
+
+                Console.WriteLine("Site ajoutés !");
             }
 
             return listSiteAdd[random.Next(listSiteAdd.Count)];
